@@ -2,7 +2,6 @@ from nonebot.adapters.onebot.v11 import GroupMessageEvent
 from nonebot.plugin import on_message
 import re, sqlite3, datetime
 
-
 reply = on_message(priority=100)  # 注册事件响应器，优先度很低
 
 
@@ -22,18 +21,18 @@ async def rec_group_msg(group_msg_event: GroupMessageEvent):  # 创建事件处�
     ):  # 根据row_message中是否包含 at qq= 判断是否回复特定消息
         save_to_sqlite(
             "./msg/" + "answer.db", reply_msg_id[0], sender_id, group_msg
-        )  # 回复类消息内容保存到 id.txt 文件中
+        )  
     else:
         save_to_sqlite(
             "./msg/" + "savemsg.db", "null", sender_id, group_msg
-        )  # 非回复类消息内容保存到 savemsg.txt 文件中
+        )  
 
-    if group_msg == "/问题":  # 根据消息内容，判断回复什么
-        await reply.finish("question1, question2, question3")  # 发送消息，并结束该事件
-    elif group_msg == "/help":
-        await reply.finish('Please send "问题" to me')
-    else:
-        await reply.finish()
+    # if group_msg == "/问题":  # 根据消息内容，判断回复什么
+    #     await reply.finish("question1, question2, question3")  # 发送消息，并结束该事件
+    # elif group_msg == "/help":
+    #     await reply.finish('Please send "问题" to me')
+    # else:
+    #     await reply.finish()
 
 
 def save_to_sqlite(file_name, question_id, qq_number, user_content):  # 消息保存到sqlite数据库
