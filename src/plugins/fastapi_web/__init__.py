@@ -6,8 +6,11 @@ import sqlite3, datetime
 app: FastAPI = get_app()
 
 
-def get_answer_from_db(db_file_name, tab_name):  # 从数据库中获取答案
-    get_data_sql = "SELECT QUES_ID, QQ_NUM, USER_CON FROM '%s'" % (tab_name)
+def get_answer_from_db(db_file_name, tab_name, quest_id):  # 从数据库中获取答案
+    get_data_sql = "SELECT QUES_ID, QQ_NUM, USER_CON FROM '%s' WHERE QUES_ID = '%s'" % (
+        tab_name,
+        quest_id,
+    )
     db_con = sqlite3.connect(db_file_name)
     db_cursor = db_con.cursor()
     db_cursor.execute(get_data_sql)
@@ -24,10 +27,10 @@ def get_quest_from_db(db_file_name, tab_name):  # 从数据库中获取答案
     return data
 
 
-@app.get("/get_answer")
-async def get_answer():
+@app.get("/get_answer/{quest_id}")
+async def get_answer(quest_id: str):
     tab_name = "ans_" + str(datetime.date.today().__format__("%Y%m%d"))
-    data_list = get_answer_from_db("./msg/answer.db", tab_name)
+    data_list = get_answer_from_db("./msg/answer.db", tab_name, quest_id)
     dict_array = []
     for i in range(0, len(data_list)):
         if i <= len(data_list):
