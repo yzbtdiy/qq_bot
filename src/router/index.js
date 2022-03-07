@@ -7,9 +7,13 @@ const routes = [
     component: () => import('../views/Home.vue'),
     children: [
       {
-        path: '/answer',
+        path: '/answer/:ques_id',
         name: 'Answer',
-        component: () => import('../components/Answer.vue')
+        component: () => import('../components/Answer.vue'),
+        props: { default: true }
+        // redirect: {
+        //   name: 'Home'
+        // }
       },
       {
         path: '/question',

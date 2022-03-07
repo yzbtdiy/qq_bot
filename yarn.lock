@@ -208,7 +208,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/devtools-api@npm:^6.0.0-beta.18":
+"@vue/devtools-api@npm:^6.0.0-beta.18, @vue/devtools-api@npm:^6.0.0-beta.21":
   version: 6.0.12
   resolution: "@vue/devtools-api@npm:6.0.12"
   checksum: 5eb4601a6f6601c4481eab54c7f05f8e373ac3f2b5ab6973847a47e7ddbec7a9d2cd80dc692905da9e8615ac64a208702c54f7dfac47f7aa2168a5b7dd176545
@@ -422,6 +422,7 @@ __metadata:
     element-plus: ^2.0.4
     js-base64: ^3.7.2
     less: ^4.1.2
+    pinia: ^2.0.11
     qs: ^6.10.3
     unplugin-auto-import: ^0.6.1
     unplugin-vue-components: ^0.17.21
@@ -1630,6 +1631,25 @@ __metadata:
   version: 4.0.1
   resolution: "pify@npm:4.0.1"
   checksum: 9c4e34278cb09987685fa5ef81499c82546c033713518f6441778fbec623fc708777fe8ac633097c72d88470d5963094076c7305cafc7ad340aae27cfacd856b
+  languageName: node
+  linkType: hard
+
+"pinia@npm:^2.0.11":
+  version: 2.0.11
+  resolution: "pinia@npm:2.0.11"
+  dependencies:
+    "@vue/devtools-api": ^6.0.0-beta.21
+    vue-demi: "*"
+  peerDependencies:
+    "@vue/composition-api": ^1.4.0
+    typescript: ">=4.4.4"
+    vue: ^2.6.14 || ^3.2.0
+  peerDependenciesMeta:
+    "@vue/composition-api":
+      optional: true
+    typescript:
+      optional: true
+  checksum: 8cce95b07baae4558d60d51b59e34635c95bb333f7898462aee4d0c7b92b2b40f8c666f24dc4c2572739b5813f6dd148b1e48cf02fb0f6a047dae4b803fd731f
   languageName: node
   linkType: hard
 

@@ -13,6 +13,7 @@ function submitQuest ()
 {
   let addUrl = 'http://mybot.com/send_question/' + Base64.encode( ques.value )
   fetch( addUrl ).then( res => { return res } ).catch( err => { console.log( err ) } )
+  ques.value = ""
 }
 </script>
 

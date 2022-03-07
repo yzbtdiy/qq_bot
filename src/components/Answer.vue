@@ -8,15 +8,20 @@
 
 import axios from "axios"
 import { reactive, onMounted, ref } from "vue"
+import router from '../router'
 
 const tabData = ref( [] )
 const state = reactive( { tabData } )
 
+let quesId = router.currentRoute.value.params.ques_id
+
 onMounted( async () =>
 {
-  const result = await axios.get( 'http://mybot.com/get_answer' ).then( res => res.data )
+  const result = await axios.get( 'http://mybot.com/get_answer/' + quesId ).then( res => res.data )
   state.tabData = result
 } )
+
+
 </script>
 
 <template>
