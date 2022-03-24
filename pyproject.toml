@@ -7,13 +7,10 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.7.3"
-nonebot-adapter-onebot = "^2.0.0-beta.1"
-nonebot2 = "^2.0.0-beta.2"
-fastapi = "0.73"
+nonebot2 = "^2.0.0-beta.1"
 
 [tool.poetry.dev-dependencies]
 nb-cli = "^0.6.0"
-black = {version = "^22.1.0", allow-prereleases = true}
 
 [tool.nonebot]
 plugins = []
