@@ -29,8 +29,8 @@ function toQuestion ()
   >
     <div class="title">QQBot问答管理</div>
 
-    <el-menu-item index="1" @click=" toQuestion ">添加问题</el-menu-item>
-    <el-menu-item index="2" @click=" toAnswer ">答案收集</el-menu-item>
+    <el-menu-item index="1" @click=" toQuestion ">问题处理</el-menu-item>
+    <!-- <el-menu-item index="2" @click=" toAnswer ">答案收集</el-menu-item> -->
     <!-- <el-sub-menu index="2">
       <template #title>Workspace</template>
       <el-menu-item index="2-1">item one</el-menu-item>

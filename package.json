@@ -8,10 +8,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^0.26.0",
-    "element-plus": "^2.0.4",
+    "axios": "^0.26.1",
+    "element-plus": "^2.1.4",
     "js-base64": "^3.7.2",
-    "pinia": "^2.0.11",
+    "pinia": "^2.0.12",
     "qs": "^6.10.3",
     "vue": "^3.2.31",
     "vue-router": "4"
@@ -19,8 +19,8 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.2.4",
     "less": "^4.1.2",
-    "unplugin-auto-import": "^0.6.1",
-    "unplugin-vue-components": "^0.17.21",
+    "unplugin-auto-import": "^0.6.6",
+    "unplugin-vue-components": "^0.18.4",
     "vite": "^2.8.6"
   },
   "packageManager": "yarn@3.2.0"

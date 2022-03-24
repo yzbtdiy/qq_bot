@@ -18,26 +18,25 @@ const routes = [
       {
         path: '/question',
         name: 'Question',
-        component: () => import('../components/AddQuestion.vue')
+        component: () => import('../components/Question.vue')
       }
-    ]
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: () => import('../views/Login.vue')
-  },
+    ],
+    redirect: to => {
+      return { path: '/question' }
+    }
+  }
+
   // {
   //   path: '/question',
   //   name: 'Login',
   //   component: () => import('../views/Question.vue')
   // },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: to => {
-      return { path: '/' }
-    }
-  }
+  // {
+  //   path: '/:pathMatch(.*)*',
+  //   redirect: to => {
+  //     return { path: '/' }
+  //   }
+  // }
 ]
 
 const router = createRouter({
