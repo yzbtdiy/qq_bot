@@ -22,7 +22,7 @@ def save_que(file_name, question_id, question_txt):
 
 def save_ans(file_name, answer_id, qq_number, answer_txt, question_id):
     create_tab = (
-        "CREATE TABLE IF NOT EXISTS '%s'(ANS_ID text, QQ_NUM int, ANS_TXT text, QUES_ID text, IS_ADOPT text DEFAULT '未采用')"
+        "CREATE TABLE IF NOT EXISTS '%s'(ID INTEGER PRIMARY KEY AUTOINCREMENT, ANS_ID text, QQ_NUM int, ANS_TXT text, QUES_ID text, IS_ADOPT text DEFAULT 'None')"
         % (ans_tab)
     )
     add_data = (
@@ -35,7 +35,9 @@ def save_ans(file_name, answer_id, qq_number, answer_txt, question_id):
 
 
 def get_que(db_file):
-    get_data_sql = "SELECT QUES_ID, QUES_TXT, ADOPT_ANS FROM '%s'" % (que_tab)
+    get_data_sql = "SELECT QUES_ID, QUES_TXT, ADOPT_ANS FROM '%s' ORDER BY ID DESC" % (
+        que_tab
+    )
     db_con = sqlite3.connect(db_file)
     db_cursor = db_con.cursor()
     db_cursor.execute(get_data_sql)
@@ -43,6 +45,17 @@ def get_que(db_file):
     db_cursor.close()
     db_con.close()
     return data
+
+
+# def get_rec_que(db_file):
+#     get_data_sql = "SELECT QUES_TXT FROM '%s' ORDER BY ID DESC LIMIT 0,5" % (que_tab)
+#     db_con = sqlite3.connect(db_file)
+#     db_cursor = db_con.cursor()
+#     db_cursor.execute(get_data_sql)
+#     data = db_cursor.fetchall()
+#     db_cursor.close()
+#     db_con.close()
+#     return data
 
 
 def get_ans(db_file, quest_id):

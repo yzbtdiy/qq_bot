@@ -1,4 +1,4 @@
-from nonebot.adapters.onebot.v11 import MessageSegment, GroupMessageEvent
+from nonebot.adapters.onebot.v11 import MessageSegment, GroupMessageEvent, Message
 from nonebot.adapters.onebot.v11.exception import ActionFailed, NetworkError
 from nonebot import get_bots, on_message
 from nonebot.log import logger
@@ -30,7 +30,45 @@ async def safe_send(bot_id, send_type, type_id, message, at=False):
         )
     except ActionFailed as e:
         url = "https://haruka-bot.sk415.icu/"
-        logger.error(f"推送失败，账号可能被风控（{url}），错误信息：{e.info}")
+        logger.error(f"推送失败，账号可能被风控，错误信息：{e.info}")
+    except NetworkError as e:
+        logger.error(f"推送失败，请检查网络连接，错误信息：{e.msg}")
+
+
+async def re_send(last_ans_id, re_txt, last_ans_qq):
+    try:
+        bot = get_bots()["320785209"]
+    except KeyError:
+        logger.error(f"推送失败，Bot（）未连接")
+        return
+
+    # msg = Message(
+    #     [
+    #         MessageSegment(
+    #             type="reply",
+    #             data={
+    #                 "id": f"{last_ans_id}",
+    #                 "text": f"{re_txt}",
+    #                 "qq": f"{last_ans_qq}",
+    #             },
+    #         ),
+    #     ]
+    # )
+
+    msg = Message(
+        [
+            MessageSegment.reply(last_ans_id),
+            MessageSegment.text(re_txt),
+            MessageSegment.at(last_ans_qq),
+        ]
+    )
+
+    try:
+        return await bot.send_group_msg(
+            group_id="755048599", message=msg, auto_escape=False
+        )
+    except ActionFailed as e:
+        logger.error(f"推送失败，账号可能被风控，错误信息：{e.info}")
     except NetworkError as e:
         logger.error(f"推送失败，请检查网络连接，错误信息：{e.msg}")
 

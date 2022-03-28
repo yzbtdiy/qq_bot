@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from urllib.parse import parse_qsl
 import base64, re
 
-from .diy_bot import safe_send
+from .diy_bot import safe_send, re_send
 from .db_io import (
     save_que,
     get_que,
@@ -37,6 +37,15 @@ async def send_question(quest: str = Body(...)):
     return question
 
 
+@app.post("/reask_question")
+async def reask_question(quest: str = Body(...)):
+    re_question = parse_qsl(quest)
+    result = await re_send(re_question[0][1], re_question[2][1], re_question[1][1])
+    question = re.sub("'", "''", re_question[2][1])
+    save_que("./msg/question.db", str(result["message_id"]), question)
+    print(result)
+
+
 @app.get("/get_question")
 async def get_question():
     data_list = get_que("./msg/question.db")
@@ -48,6 +57,12 @@ async def get_question():
         data_dict["ADOPT_ANS"] = data_list[i][2]
         dict_array.append(data_dict)
     return jsonable_encoder(dict_array)
+
+
+# @app.get("/get_recent_quest")
+# async def get_recent_quest():
+#     data_list = get_rec_que("./msg/question.db")
+#     return data_list
 
 
 @app.get("/get_answer/{quest_id}")
@@ -65,13 +80,13 @@ async def get_answer(quest_id: str):
     return jsonable_encoder(dict_array)
 
 
-@app.get("/update_question/{quest_id}/{answer_id}")
+@app.put("/update_question/{quest_id}/{answer_id}")
 async def update_question(quest_id: str, answer_id: str):
     result = update_que("./msg/question.db", quest_id, answer_id)
     return result
 
 
-@app.get("/update_answer/{answer_id}/{is_adopt}")
+@app.put("/update_answer/{answer_id}/{is_adopt}")
 async def update_question(answer_id: str, is_adopt: str):
     result = update_ans(
         "./msg/answer.db",
