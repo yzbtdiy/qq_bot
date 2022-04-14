@@ -6,28 +6,20 @@ from nonebot.log import logger
 import re
 
 from .db_io import save_ans
+from .config import qq, group
 
 
-async def safe_send(bot_id, send_type, type_id, message, at=False):
+async def safe_send(msg):
     """发送出现错误时, 尝试重新发送, 并捕获异常且不会中断运行"""
 
     try:
-        bot = get_bots()[str(bot_id)]
+        bot = get_bots()[qq]
     except KeyError:
-        logger.error(f"推送失败，Bot（{bot_id}）未连接")
+        logger.error(f"推送失败, Bot未连接")
         return
 
-    if at and (await bot.get_group_at_all_remain(group_id=type_id))["can_at_all"]:
-        message = MessageSegment.at("all") + message
-
     try:
-        return await bot.call_api(
-            "send_" + send_type + "_msg",
-            **{
-                "message": message,
-                "user_id" if send_type == "private" else "group_id": type_id,
-            },
-        )
+        return await bot.send_group_msg(group_id=group, message=msg, auto_escape=False)
     except ActionFailed as e:
         url = "https://haruka-bot.sk415.icu/"
         logger.error(f"推送失败，账号可能被风控，错误信息：{e.info}")
@@ -37,9 +29,9 @@ async def safe_send(bot_id, send_type, type_id, message, at=False):
 
 async def re_send(last_ans_id, re_txt, last_ans_qq):
     try:
-        bot = get_bots()["320785209"]
+        bot = get_bots()[qq]
     except KeyError:
-        logger.error(f"推送失败，Bot（）未连接")
+        logger.error(f"推送失败,Bot未连接")
         return
 
     # msg = Message(
@@ -58,8 +50,8 @@ async def re_send(last_ans_id, re_txt, last_ans_qq):
     msg = Message(
         [
             MessageSegment.reply(last_ans_id),
-            MessageSegment.text(re_txt),
             MessageSegment.at(last_ans_qq),
+            MessageSegment.text(re_txt),
         ]
     )
 
@@ -91,9 +83,7 @@ async def rec_group_msg(group_msg_event: GroupMessageEvent):  # 创建事件处�
     if (
         reply_msg_id and replay_user_id[0] == "320785209"
     ):  # 根据row_message中是否包含 at qq= 判断是否回复特定消息
-        save_ans(
-            "./msg/" + "answer.db", sender_msg_id, sender_qq, group_msg, reply_msg_id[0]
-        )
+        save_ans(sender_msg_id, sender_qq, group_msg, reply_msg_id[0])
     # else:
     #     save_answer_to_db("./msg/" + "savemsg.db", "null", sender_id, group_msg)
 

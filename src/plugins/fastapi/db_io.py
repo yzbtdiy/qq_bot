@@ -1,49 +1,123 @@
 import sqlite3, datetime
 
 
-que_tab = "que_" + str(datetime.date.today().__format__("%Y%m%d"))
-ans_tab = "ans_" + str(datetime.date.today().__format__("%Y%m%d"))
+# db_name = "./msg/" + str(datetime.date.today().__format__("%Y%m%d")) + ".db"
+
+db_name = "./msg/20220331.db"
 
 
-def save_que(file_name, question_id, question_txt):
-    create_tab = (
-        "CREATE TABLE IF NOT EXISTS '%s'(ID INTEGER PRIMARY KEY AUTOINCREMENT, QUES_ID text, QUES_TXT text, ADOPT_ANS text DEFAULT 'None')"
-        % (que_tab)
+def db_init():
+    add_que_tab = "CREATE TABLE IF NOT EXISTS questions (ID INTEGER PRIMARY KEY AUTOINCREMENT, QUE_ID TEXT, QUE_TXT TEXT, ADOPT_ANS TEXT DEFAULT 'None', G_ID INTEGER DEFAULT 'None')"
+    add_ans_tab = "CREATE TABLE IF NOT EXISTS answers (ID INTEGER PRIMARY KEY AUTOINCREMENT, ANS_ID TEXT, QQ_NUM int, ANS_TXT TEXT, QUE_ID TEXT, IS_ADOPT TEXT DEFAULT 'None')"
+    with sqlite3.connect(db_name) as db_con:
+        db_con.execute(add_que_tab)
+        db_con.execute(add_ans_tab)
+
+
+def save_que(que_id, que_txt, g_id=None):
+    add_sql = (
+        "INSERT INTO questions (ID, QUE_ID, QUE_TXT) VALUES (NULL, '%s', '%s')"
+        % (
+            que_id,
+            que_txt,
+        )
     )
-    add_data = "INSERT INTO '%s'(ID, QUES_ID, QUES_TXT) VALUES (NULL, '%s', '%s')" % (
-        que_tab,
-        question_id,
-        question_txt,
-    )
-    with sqlite3.connect(file_name) as db_con:
-        db_con.execute(create_tab)
-        db_con.execute(add_data)
+    with sqlite3.connect(db_name) as db_con:
+        db_con.execute(add_sql)
+        db_cursor = db_con.cursor()
+        if g_id:
+            update_sql = "UPDATE questions SET G_ID = %d WHERE QUE_ID = '%s'" % (
+                g_id,
+                que_id,
+            )
+        else:
+            get_index = "SELECT ID FROM questions WHERE QUE_ID = '%s'" % que_id
+            db_cursor.execute(get_index)
+            index = db_cursor.fetchall()[0][0]
+            update_sql = "UPDATE questions SET G_ID = %d WHERE QUE_ID = '%s'" % (
+                index,
+                que_id,
+            )
+        db_con.execute(update_sql)
 
 
-def save_ans(file_name, answer_id, qq_number, answer_txt, question_id):
-    create_tab = (
-        "CREATE TABLE IF NOT EXISTS '%s'(ID INTEGER PRIMARY KEY AUTOINCREMENT, ANS_ID text, QQ_NUM int, ANS_TXT text, QUES_ID text, IS_ADOPT text DEFAULT 'None')"
-        % (ans_tab)
+def get_gid(ans_id):
+    get_sql = (
+        "SELECT q.G_ID, q.QUE_ID FROM questions AS q INNER JOIN answers AS a WHERE a.ANS_ID = '%s' AND q.QUE_ID = a.QUE_ID"
+        % ans_id
     )
-    add_data = (
-        "INSERT INTO '%s'(ANS_ID, QQ_NUM, ANS_TXT, QUES_ID) VALUES ('%s' ,%d, '%s', '%s')"
-        % (ans_tab, answer_id, qq_number, answer_txt, question_id)
-    )
-    with sqlite3.connect(file_name) as db_con:
-        db_con.execute(create_tab)
-        db_con.execute(add_data)
+    with sqlite3.connect(db_name) as db_con:
+        db_cursor = db_con.cursor()
+        db_cursor.execute(get_sql)
+        g_id = db_cursor.fetchall()[0][0]
+    return g_id
 
 
-def get_que(db_file):
-    get_data_sql = "SELECT QUES_ID, QUES_TXT, ADOPT_ANS FROM '%s' ORDER BY ID DESC" % (
-        que_tab
+def save_ans(ans_id, qq_num, ans_txt, que_id):
+    add_sql = (
+        "INSERT INTO answers (ANS_ID, QQ_NUM, ANS_TXT, QUE_ID) VALUES ('%s' ,%d, '%s', '%s')"
+        % (ans_id, qq_num, ans_txt, que_id)
     )
-    db_con = sqlite3.connect(db_file)
-    db_cursor = db_con.cursor()
-    db_cursor.execute(get_data_sql)
-    data = db_cursor.fetchall()
-    db_cursor.close()
-    db_con.close()
+    with sqlite3.connect(db_name) as db_con:
+        db_con.execute(add_sql)
+
+
+def get_que():
+    get_sql = (
+        "SELECT QUE_ID, QUE_TXT, ADOPT_ANS, G_ID FROM questions ORDER BY G_ID DESC"
+    )
+    with sqlite3.connect(db_name) as db_con:
+        db_cursor = db_con.cursor()
+        db_cursor.execute(get_sql)
+        data = db_cursor.fetchall()
+    return data
+
+
+def get_ans(que_id):
+    get_sql = (
+        "SELECT ANS_ID, QQ_NUM, ANS_TXT, QUE_ID, IS_ADOPT FROM answers WHERE QUE_ID = '%s'"
+        % (que_id,)
+    )
+    with sqlite3.connect(db_name) as db_con:
+        db_cursor = db_con.cursor()
+        db_cursor.execute(get_sql)
+        data = db_cursor.fetchall()
+    return data
+
+
+def update_que(que_id, ans_id):
+    update_sql = "UPDATE questions SET ADOPT_ANS = '%s' WHERE QUE_ID = '%s'" % (
+        ans_id,
+        que_id,
+    )
+    with sqlite3.connect(db_name) as db_con:
+        db_cursor = db_con.cursor()
+        db_cursor.execute(update_sql)
+
+
+def update_ans(is_adopt, ans_id):
+    reset_sql = "UPDATE answers SET IS_ADOPT = 'None' WHERE IS_ADOPT = '采用'"
+    update_sql = "UPDATE answers SET IS_ADOPT = '%s' WHERE ANS_ID = '%s'" % (
+        is_adopt,
+        ans_id,
+    )
+    with sqlite3.connect(db_name) as db_con:
+        db_cursor = db_con.cursor()
+        db_cursor.execute(reset_sql)
+        db_cursor.execute(update_sql)
+
+
+def get_num(count_item):
+    if count_item == "que_num":
+        count_sql = "SELECT COUNT(*) FROM questions"
+    elif count_item == "ans_num":
+        count_sql = "SELECT COUNT(*) FROM answers"
+    elif count_item == "solve_que":
+        count_sql = "SELECT COUNT(*) FROM questions WHERE NOT ADOPT_ANS='None'"
+    with sqlite3.connect(db_name) as db_con:
+        db_cursor = db_con.cursor()
+        db_cursor.execute(count_sql)
+        data = db_cursor.fetchall()
     return data
 
 
@@ -56,44 +130,3 @@ def get_que(db_file):
 #     db_cursor.close()
 #     db_con.close()
 #     return data
-
-
-def get_ans(db_file, quest_id):
-    get_data_sql = (
-        "SELECT ANS_ID, QQ_NUM, ANS_TXT, QUES_ID, IS_ADOPT FROM '%s' WHERE QUES_ID = '%s'"
-        % (
-            ans_tab,
-            quest_id,
-        )
-    )
-    db_con = sqlite3.connect(db_file)
-    db_cursor = db_con.cursor()
-    db_cursor.execute(get_data_sql)
-    data = db_cursor.fetchall()
-    db_cursor.close()
-    db_con.close()
-    return data
-
-
-def update_que(db_file, quest_id, answer_id):
-    update_sql = "UPDATE '%s' SET ADOPT_ANS = '%s' WHERE QUES_ID = '%s'" % (
-        que_tab,
-        answer_id,
-        quest_id,
-    )
-    with sqlite3.connect(db_file) as db_con:
-        db_cursor = db_con.cursor()
-        db_cursor.execute(update_sql)
-
-
-def update_ans(db_file, is_adopt, answer_id):
-    reset_sql = "UPDATE '%s' SET IS_ADOPT = '未采用' WHERE IS_ADOPT = '采用'" % (ans_tab)
-    update_sql = "UPDATE '%s' SET IS_ADOPT = '%s' WHERE ANS_ID = '%s'" % (
-        ans_tab,
-        is_adopt,
-        answer_id,
-    )
-    with sqlite3.connect(db_file) as db_con:
-        db_cursor = db_con.cursor()
-        db_cursor.execute(reset_sql)
-        db_cursor.execute(update_sql)
