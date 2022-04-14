@@ -7,7 +7,7 @@ const routes = [
     component: () => import('../views/Home.vue'),
     children: [
       {
-        path: '/answer/:ques_id',
+        path: '/answer/:que_id',
         name: 'Answer',
         component: () => import('../components/Answer.vue'),
         props: { default: true }
@@ -24,13 +24,13 @@ const routes = [
     redirect: to => {
       return { path: '/question' }
     }
-  }
+  },
 
-  // {
-  //   path: '/question',
-  //   name: 'Login',
-  //   component: () => import('../views/Question.vue')
-  // },
+  {
+    path: '/overview',
+    name: 'Overview',
+    component: () => import('../views/Overview.vue')
+  },
   // {
   //   path: '/:pathMatch(.*)*',
   //   redirect: to => {

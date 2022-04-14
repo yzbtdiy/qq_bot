@@ -6,18 +6,21 @@ import router from '../router'
 const tabData = ref( [] )
 const state = reactive( { tabData } )
 const currentRow = ref()
-const singleTableRef = ref()
-const setCurrent = ( row ) =>
-{
-  singleTableRef.value.setCurrentRow( row )
-}
+// const singleTableRef = ref()
+// const CancelCurrent = ( row ) =>
+// {
+//   singleTableRef.value.setCurrentRow( row )
+// }
 
 const handleCurrentChange = ( val ) =>
 {
   currentRow.value = val
 }
 
-let questId = router.currentRoute.value.params.ques_id
+
+const reQue = ref( '' )
+
+let questId = router.currentRoute.value.params.que_id
 
 
 onMounted( async () =>
@@ -29,9 +32,9 @@ onMounted( async () =>
 
 function useIt ()
 {
-  let answerId = currentRow.value.ANS_ID
+  const answerId = currentRow.value.ANS_ID
 
-  if ( currentRow && currentRow.value.IS_ADOPT == "未采用" )
+  if ( currentRow && currentRow.value.IS_ADOPT == "None" )
   {
     currentRow.value.IS_ADOPT = "采用"
     request.put( '/update_question/' + questId + '/' + answerId )
@@ -41,10 +44,24 @@ function useIt ()
   router.go( 0 )
 }
 
+function reAsk ()
+{
+  const answerId = currentRow.value.ANS_ID
+  const answerQq = currentRow.value.QQ_NUM
+  const askTxt = reQue.value
+  request.post( "/reask_question/", { answerId, answerQq, askTxt } )
+}
+
 </script>
 
 <template>
   <div>
+    <div>
+      <el-input v-model=" reQue " placeholder="请选择答案, 再次提问" />
+      <el-button @click=" useIt ">采用答案</el-button>
+      <el-button @click=" reAsk ">后续提问</el-button>
+      <!-- <el-button @click=" CancelCurrent ">取消选择</el-button> -->
+    </div>
     <el-table
       ref="singleTableRef"
       :data=" tabData "
@@ -57,12 +74,11 @@ function useIt ()
       <el-table-column prop="ANS_TXT" label="答案" />
       <el-table-column prop="IS_ADOPT" label="状态" sortable width="120" fixed="right" />
     </el-table>
-    <div style="margin-top: 20px">
-      <el-button @click=" useIt ">采用答案</el-button>
-      <el-button @click=" setCurrent() ">取消选择</el-button>
-    </div>
   </div>
 </template>
 
 <style scoped>
+.el-button {
+  margin-top: 16px;
+}
 </style>

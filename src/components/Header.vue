@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from 'vue'
-import { routerKey } from 'vue-router'
+
 import router from '../router'
 
 const activeIndex = ref( '1' )
-const activeIndex2 = ref( '1' )
+
 const handleSelect = ( key, keyPath ) =>
 {
   // console.log( key, keyPath )
